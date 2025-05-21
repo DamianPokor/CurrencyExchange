@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("CurrencyExchange.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+02ed0d810027567d42a7b3b76a72dc5bd0c374ce")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+af6be67eded0f0522dd64814dd58b2da6500b671")]
 [assembly: System.Reflection.AssemblyProductAttribute("CurrencyExchange.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CurrencyExchange.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

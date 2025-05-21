@@ -10,15 +10,14 @@ namespace CurrencyExchange.API.Data.Entities
         public int UserId { get; set; }
         
         public string AccountNumber { get; set; } = string.Empty;
-
-        [Column(TypeName = "decimal(18,2)")]
+        
         public decimal Balance { get; set; }
         
         public string Currency { get; set; } = string.Empty;
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-        // Nawigacje (opcjonalnie)
+        // Nawigacje 
         public virtual User? User { get; set; }
         public virtual Currency? CurrencyNavigation { get; set; }
     }
