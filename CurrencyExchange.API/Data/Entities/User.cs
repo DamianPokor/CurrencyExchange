@@ -9,6 +9,8 @@ namespace CurrencyExchange.API.Data.Entities
         public string FirstName { get; set; } = string.Empty;
 
         public string LastName { get; set; } = string.Empty;
+
+        public string Password { get; set; }
         
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
