@@ -1,55 +1,55 @@
-using CurrencyExchange.API.Data;
 using CurrencyExchange.API.Data.Entities;
 using CurrencyExchange.API.Models;
 using CurrencyExchange.API.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
-namespace CurrencyExchange.API.Controllers
+namespace CurrencyExchange.API.Controllers;
+
+[ApiController]
+[Route("api/auth")]
+public class AuthController(
+    UserManager<User> userManager,
+    SignInManager<User> signInManager,
+    TokenService tokenService)
+    : ControllerBase
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class AuthController : ControllerBase
+    [HttpPost("register")]
+    public async Task<IActionResult> Register(AuthRequest request)
     {
-        private readonly AppDbContext _context;
-        private readonly TokenService _tokenService;
+        if (await userManager.FindByEmailAsync(request.Email) != null)
+            return BadRequest("Email already in use");
 
-        public AuthController(AppDbContext context, TokenService tokenService)
+        var user = new User
         {
-            _context = context;
-            _tokenService = tokenService;
+            UserName = request.Email, // Identity wymaga UserName
+            Email = request.Email,
+            FirstName = "Nowy",
+            LastName = "Użytkownik"
+        };
+
+        var result = await userManager.CreateAsync(user, request.Password);
+        if (!result.Succeeded)
+        {
+            return BadRequest(result.Errors);
         }
 
-        [HttpPost("register")]
-        public async Task<IActionResult> Register(AuthRequest request)
-        {
-            if (await _context.Users.AnyAsync(u => u.Email == request.Email))
-                return BadRequest("Email already in use");
+        var token = tokenService.GenerateToken(user);
+        return Created("", new AuthResponse { Email = user.Email, Token = token });
+    }    
 
-            var user = new User
-            {
-                Email = request.Email,
-                Password = BCrypt.Net.BCrypt.HashPassword(request.Password),
-                FirstName = "Nowy",
-                LastName = "Użytkownik"
-            };
+    [HttpPost("login")]
+    public async Task<IActionResult> Login(AuthRequest request)
+    {
+        var user = await userManager.FindByEmailAsync(request.Email);
+        if (user == null)
+            return BadRequest("Invalid credentials");
 
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
+        var result = await signInManager.CheckPasswordSignInAsync(user, request.Password, false);
+        if (!result.Succeeded)
+            return BadRequest("Invalid credentials");
 
-            var token = _tokenService.GenerateToken(user);
-            return Ok(new AuthResponse { Email = user.Email, Token = token });
-        }
-
-        [HttpPost("login")]
-        public async Task<IActionResult> Login(AuthRequest request)
-        {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
-            if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.Password))
-                return Unauthorized("Invalid credentials");
-
-            var token = _tokenService.GenerateToken(user);
-            return Ok(new AuthResponse { Email = user.Email, Token = token });
-        }
+        var token = tokenService.GenerateToken(user);
+        return Ok(new AuthResponse { Email = user.Email, Token = token });
     }
 }

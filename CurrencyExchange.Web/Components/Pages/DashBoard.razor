@@ -1,0 +1,585 @@
+@page "/dashboard"
+@using System.Globalization
+@inject NavigationManager Navigation
+
+
+<PageTitle>My Accounts - Dashboard</PageTitle>
+
+<div class="dashboard-container">
+    <div class="header">
+        <div class="logo">
+            <div class="logo-icon">$</div>
+        </div>
+        <nav class="nav-menu">
+            <button class="nav-btn @(activeTab == "Exchange" ? "active" : "")" @onclick="@(() => SetActiveTab("Exchange"))">
+                Exchange
+            </button>
+            <button class="nav-btn @(activeTab == "MyAccounts" ? "active" : "")" @onclick="@(() => SetActiveTab("MyAccounts"))">
+                My Accounts
+            </button>
+            <button class="nav-btn @(activeTab == "History" ? "active" : "")" @onclick="@(() => SetActiveTab("History"))">
+                History
+            </button>
+            <button class="nav-btn @(activeTab == "Settings" ? "active" : "")" @onclick="@(() => SetActiveTab("Settings"))">
+                Settings
+            </button>
+            <button class="nav-btn logout" @onclick="HandleLogout">
+                Log Out
+            </button>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        @if (activeTab == "MyAccounts")
+        {
+            <div class="accounts-section">
+                <div class="accounts-header">
+                    <div class="sort-container">
+                        <label for="sort-select">Sortuj</label>
+                        <select id="sort-select" @onchange="HandleSortChange" class="sort-select">
+                            <option value="currency">Currency</option>
+                            <option value="balance">Balance</option>
+                            <option value="account">Account Number</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" @onclick="ShowCreateAccountModal">
+                        Create new Bank account
+                    </button>
+                </div>
+
+                <div class="accounts-list">
+                    @foreach (var account in GetSortedAccounts())
+                    {
+                        <div class="account-row">
+                            <div class="account-info">
+                                <div class="currency-code">@account.Currency</div>
+                                <div class="balance">@account.Balance.ToString("N2", CultureInfo.InvariantCulture)</div>
+                            </div>
+                            <div class="account-number">@account.AccountNumber</div>
+                            <div class="account-actions">
+                                <button class="btn-icon" @onclick="() => EditAccount(account)" title="Edit Account">
+                                    ⚙️
+                                </button>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <div class="account-actions-footer">
+                    <button class="btn btn-secondary" @onclick="ShowAddFundsModal">Add Funds</button>
+                    <button class="btn btn-secondary" @onclick="ShowCashOutModal">Cash out</button>
+                </div>
+            </div>
+        }
+        else if (activeTab == "Exchange")
+        {
+            <div class="exchange-section">
+                <h2>Currency Exchange</h2>
+                <p>Exchange functionality will be implemented here.</p>
+            </div>
+        }
+        else if (activeTab == "History")
+        {
+            <div class="history-section">
+                <h2>Transaction History</h2>
+                <p>Transaction history will be displayed here.</p>
+            </div>
+        }
+        else if (activeTab == "Settings")
+        {
+            <div class="settings-section">
+                <h2>Account Settings</h2>
+                <p>Account settings will be available here.</p>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Create Account Modal -->
+@if (showCreateAccountModal)
+{
+    <div class="modal-overlay" @onclick="CloseCreateAccountModal">
+        <div class="modal-content" @onclick:stopPropagation="true">
+            <div class="modal-header">
+                <h3>Create New Bank Account</h3>
+                <button class="modal-close" @onclick="CloseCreateAccountModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Currency</label>
+                    <select @bind="newAccountCurrency" class="form-select">
+                        <option value="">Select Currency</option>
+                        <option value="USD">USD - US Dollar</option>
+                        <option value="EUR">EUR - Euro</option>
+                        <option value="PLN">PLN - Polish Zloty</option>
+                        <option value="GBP">GBP - British Pound</option>
+                        <option value="CNY">CNY - Chinese Yuan</option>
+                        <option value="NOK">NOK - Norwegian Krone</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Initial Balance (Optional)</label>
+                    <input type="number" @bind="newAccountBalance" class="form-input" placeholder="0.00" step="0.01" min="0" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" @onclick="CloseCreateAccountModal">Cancel</button>
+                <button class="btn btn-primary" @onclick="CreateNewAccount" disabled="@string.IsNullOrEmpty(newAccountCurrency)">
+                    Create Account
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+<style>
+    .dashboard-container {
+        min-height: 100vh;
+        background: #f5f5f5;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .header {
+        background: white;
+        padding: 0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .logo {
+        padding: 20px 40px;
+    }
+
+    .logo-icon {
+        width: 50px;
+        height: 50px;
+        background: #333;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 24px;
+        border: 3px solid #333;
+    }
+
+    .nav-menu {
+        display: flex;
+        height: 100%;
+    }
+
+    .nav-btn {
+        padding: 20px 30px;
+        border: none;
+        background: transparent;
+        color: #666;
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border-bottom: 3px solid transparent;
+    }
+
+    .nav-btn:hover {
+        background: #f8f9fa;
+        color: #333;
+    }
+
+    .nav-btn.active {
+        color: #333;
+        border-bottom-color: #007bff;
+        background: #f8f9fa;
+    }
+
+    .nav-btn.logout {
+        background: #666;
+        color: white;
+    }
+
+    .nav-btn.logout:hover {
+        background: #555;
+    }
+
+    .main-content {
+        padding: 40px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .accounts-section {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .accounts-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #e1e5e9;
+    }
+
+    .sort-container {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .sort-container label {
+        font-weight: 500;
+        color: #666;
+    }
+
+    .sort-select {
+        padding: 8px 12px;
+        border: 2px solid #e1e5e9;
+        border-radius: 6px;
+        font-size: 14px;
+        background: white;
+        cursor: pointer;
+    }
+
+    .sort-select:focus {
+        outline: none;
+        border-color: #007bff;
+    }
+
+    .btn {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .btn-primary {
+        background: #666;
+        color: white;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+        background: #555;
+        transform: translateY(-2px);
+    }
+
+    .btn-primary:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    .btn-secondary {
+        background: #666;
+        color: white;
+        border: 1px solid #666;
+    }
+
+    .btn-secondary:hover {
+        background: #555;
+        border-color: #555;
+    }
+
+    .accounts-list {
+        margin-bottom: 30px;
+    }
+
+    .account-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px 0;
+        border-bottom: 1px solid #f0f0f0;
+        transition: background-color 0.3s ease;
+    }
+
+    .account-row:hover {
+        background: #f8f9fa;
+        margin: 0 -20px;
+        padding: 20px;
+        border-radius: 8px;
+    }
+
+    .account-info {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        flex: 1;
+    }
+
+    .currency-code {
+        font-weight: bold;
+        font-size: 16px;
+        color: #333;
+        min-width: 50px;
+    }
+
+    .balance {
+        font-size: 16px;
+        color: #333;
+        min-width: 100px;
+    }
+
+    .account-number {
+        font-family: 'Courier New', monospace;
+        color: #666;
+        font-size: 14px;
+        flex: 2;
+        text-align: center;
+    }
+
+    .account-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .btn-icon {
+        background: none;
+        border: none;
+        font-size: 18px;
+        cursor: pointer;
+        padding: 8px;
+        border-radius: 4px;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-icon:hover {
+        background: #f0f0f0;
+    }
+
+    .account-actions-footer {
+        display: flex;
+        gap: 15px;
+        justify-content: flex-end;
+        padding-top: 20px;
+        border-top: 1px solid #e1e5e9;
+    }
+
+    .exchange-section, .history-section, .settings-section {
+        background: white;
+        border-radius: 12px;
+        padding: 40px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+
+    .exchange-section h2, .history-section h2, .settings-section h2 {
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    /* Modal Styles */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+
+    .modal-content {
+        background: white;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 500px;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 30px;
+        border-bottom: 1px solid #e1e5e9;
+    }
+
+    .modal-header h3 {
+        margin: 0;
+        color: #333;
+        font-size: 20px;
+    }
+
+    .modal-close {
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        color: #666;
+        padding: 0;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: background-color 0.3s ease;
+    }
+
+    .modal-close:hover {
+        background: #f0f0f0;
+    }
+
+    .modal-body {
+        padding: 30px;
+    }
+
+    .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 15px;
+        padding: 20px 30px;
+        border-top: 1px solid #e1e5e9;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: #333;
+    }
+
+    .form-select, .form-input {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #e1e5e9;
+        border-radius: 6px;
+        font-size: 16px;
+        transition: border-color 0.3s ease;
+    }
+
+    .form-select:focus, .form-input:focus {
+        outline: none;
+        border-color: #007bff;
+    }
+</style>
+
+@code {
+    private string activeTab = "MyAccounts";
+    private string sortBy = "currency";
+    private bool showCreateAccountModal = false;
+    private string newAccountCurrency = string.Empty;
+    private decimal newAccountBalance = 0;
+
+    private List<BankAccount> accounts = new()
+    {
+        new BankAccount { Currency = "PLN", Balance = 159.99m, AccountNumber = "03 7483 9405 9382 7028 3944 7876" },
+        new BankAccount { Currency = "USD", Balance = 70.88m, AccountNumber = "03 6666 0978 6666 2456 3944 7450" },
+        new BankAccount { Currency = "EUR", Balance = 13.20m, AccountNumber = "42 2222 9405 9382 3337 3944 2789" },
+        new BankAccount { Currency = "CNY", Balance = 999.12m, AccountNumber = "33 7483 6789 9382 6543 5555 0000" },
+        new BankAccount { Currency = "NOK", Balance = 0.00m, AccountNumber = "11 3456 3477 777 7654 3944 5467" }
+    };
+
+    private void SetActiveTab(string tab)
+    {
+        activeTab = tab;
+    }
+
+    private void HandleSortChange(ChangeEventArgs e)
+    {
+        sortBy = e.Value?.ToString() ?? "currency";
+    }
+
+    private IEnumerable<BankAccount> GetSortedAccounts()
+    {
+        return sortBy switch
+        {
+            "balance" => accounts.OrderByDescending(a => a.Balance),
+            "account" => accounts.OrderBy(a => a.AccountNumber),
+            _ => accounts.OrderBy(a => a.Currency)
+        };
+    }
+
+    private void ShowCreateAccountModal()
+    {
+        showCreateAccountModal = true;
+        newAccountCurrency = string.Empty;
+        newAccountBalance = 0;
+    }
+
+    private void CloseCreateAccountModal()
+    {
+        showCreateAccountModal = false;
+    }
+
+    private void CreateNewAccount()
+    {
+        if (!string.IsNullOrEmpty(newAccountCurrency))
+        {
+            var random = new Random();
+            var newAccount = new BankAccount
+            {
+                Currency = newAccountCurrency,
+                Balance = newAccountBalance,
+                AccountNumber = GenerateAccountNumber(random)
+            };
+
+            accounts.Add(newAccount);
+            CloseCreateAccountModal();
+        }
+    }
+
+    private string GenerateAccountNumber(Random random)
+    {
+        // Generate a realistic-looking account number
+        var parts = new string[6];
+        parts[0] = random.Next(10, 99).ToString();
+        for (int i = 1; i < 6; i++)
+        {
+            parts[i] = random.Next(1000, 9999).ToString();
+        }
+        return string.Join(" ", parts);
+    }
+
+    private void EditAccount(BankAccount account)
+    {
+        // Implement account editing logic
+        Console.WriteLine($"Edit account: {account.Currency} - {account.AccountNumber}");
+    }
+
+    private void ShowAddFundsModal()
+    {
+        // Implement add funds functionality
+        Console.WriteLine("Show add funds modal");
+    }
+
+    private void ShowCashOutModal()
+    {
+        // Implement cash out functionality
+        Console.WriteLine("Show cash out modal");
+    }
+
+    private void HandleLogout()
+    {
+        // Implement logout logic
+        Navigation.NavigateTo("/login");
+    }
+
+    public class BankAccount
+    {
+        public string Currency { get; set; } = string.Empty;
+        public decimal Balance { get; set; }
+        public string AccountNumber { get; set; } = string.Empty;
+    }
+}

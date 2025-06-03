@@ -1,3 +1,4 @@
+using Microsoft.OpenApi.Models;
 using CurrencyExchange.API.Data;
 using CurrencyExchange.API.Data.Entities;
 using CurrencyExchange.API.Services;
@@ -7,17 +8,49 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
+
+
 var builder = WebApplication.CreateBuilder(args);
 
 // === Serwisy ===
 builder.Services.AddControllers();
-builder.Services.AddOpenApi();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(options =>
+{
+    // Dodaj schemat JWT
+    options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+        Description = "Wprowadź token w formacie: Bearer {token}"
+    });
+
+    // Wymaganie autoryzacji do endpointów
+    options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+    {
+        {
+            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            {
+                Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                {
+                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
+});
+
 
 // === Baza danych ===
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// === Identity (używa Twojego User dziedziczącego po IdentityUser<int>) ===
+// === Identity ===
 builder.Services.AddIdentity<User, IdentityRole<int>>(options =>
     {
         options.Password.RequireDigit = true;
@@ -27,12 +60,11 @@ builder.Services.AddIdentity<User, IdentityRole<int>>(options =>
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
-// === JWT (jeśli planujesz logowanie tokenowe) ===
+// === JWT ===
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
         var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!);
-
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
@@ -45,7 +77,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-// === TokenService (generowanie JWT) ===
+// === TokenService ===
 builder.Services.AddScoped<TokenService>();
 
 var app = builder.Build();
@@ -57,13 +89,15 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseSwagger();
+app.UseSwaggerUI();
 
-app.UseAuthentication(); // JWT / Identity auth
+app.UseAuthentication(); // <-- przed Authorization!
 app.UseAuthorization();
 
 app.MapControllers();
 
-// === Automatyczna migracja bazy danych ===
+// === Migracja bazy danych ===
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -81,45 +115,3 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.Run();
-
-
-/*using CurrencyExchange.API.Data;
-using Microsoft.EntityFrameworkCore;
-
-var builder = WebApplication.CreateBuilder(args);
-
-builder.Services.AddControllers();
-builder.Services.AddOpenApi();
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-var app = builder.Build();
-
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
-
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
-app.MapControllers();
-
-using var scope = app.Services.CreateScope();
-var services = scope.ServiceProvider;
-
-try
-{
-    var context = services.GetRequiredService<AppDbContext>();
-    await context.Database.MigrateAsync();
-    await context.Database.EnsureCreatedAsync();
-    await context.SaveChangesAsync();
-}
-catch (Exception ex)
-{
-    var logger = services.GetRequiredService<ILogger<Program>>();
-    logger.LogError(ex, "An error occurred during migration");
-}
-
-app.Run();*/

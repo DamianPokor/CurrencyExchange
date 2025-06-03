@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CurrencyExchange.API", "CurrencyExchange.API\CurrencyExchange.API.csproj", "{3EA43EE9-8B5A-4CB8-8F24-5D24008A7535}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CurrencyExchange.Web", "CurrencyExchange.Web\CurrencyExchange.Web.csproj", "{1849CF9D-BE7E-43AA-B8AF-D5DEA37DD5F5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{3EA43EE9-8B5A-4CB8-8F24-5D24008A7535}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3EA43EE9-8B5A-4CB8-8F24-5D24008A7535}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3EA43EE9-8B5A-4CB8-8F24-5D24008A7535}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1849CF9D-BE7E-43AA-B8AF-D5DEA37DD5F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1849CF9D-BE7E-43AA-B8AF-D5DEA37DD5F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1849CF9D-BE7E-43AA-B8AF-D5DEA37DD5F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1849CF9D-BE7E-43AA-B8AF-D5DEA37DD5F5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
