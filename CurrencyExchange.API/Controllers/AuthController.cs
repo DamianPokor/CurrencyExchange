@@ -12,31 +12,41 @@ public class AuthController(
     UserManager<User> userManager,
     SignInManager<User> signInManager,
     TokenService tokenService)
+    
     : ControllerBase
 {
     [HttpPost("register")]
-    public async Task<IActionResult> Register(AuthRequest request)
+public async Task<IActionResult> Register([FromBody] AuthRequest model)
+{
+    if (!model.AcceptTerms)
+        return BadRequest(new AuthResponse { Success = false, Message = "Terms must be accepted." });
+
+    if (model.Password != model.ConfirmPassword)
+        return BadRequest(new AuthResponse { Success = false, Message = "Passwords do not match." });
+
+    var user = new User
     {
-        if (await userManager.FindByEmailAsync(request.Email) != null)
-            return BadRequest("Email already in use");
+        UserName = model.Username,
+        Email = model.Email,
+        FirstName = model.FirstName,
+        LastName = model.LastName
+    };
 
-        var user = new User
-        {
-            UserName = request.Email, // Identity wymaga UserName
-            Email = request.Email,
-            FirstName = "Nowy",
-            LastName = "Użytkownik"
-        };
+    var result = await userManager.CreateAsync(user, model.Password);
 
-        var result = await userManager.CreateAsync(user, request.Password);
-        if (!result.Succeeded)
-        {
-            return BadRequest(result.Errors);
-        }
+    if (!result.Succeeded)
+    {
+        var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+        return BadRequest(new AuthResponse { Success = false, Message = errors });
+    }
 
-        var token = tokenService.GenerateToken(user);
-        return Created("", new AuthResponse { Email = user.Email, Token = token });
-    }    
+    return StatusCode(201, new AuthResponse
+    {
+        Success = true,
+        Message = "User registered successfully."
+    });
+}
+
 
     [HttpPost("login")]
     public async Task<IActionResult> Login(AuthRequest request)
@@ -50,6 +60,6 @@ public class AuthController(
             return BadRequest("Invalid credentials");
 
         var token = tokenService.GenerateToken(user);
-        return Ok(new AuthResponse { Email = user.Email, Token = token });
+        return Ok(new AuthResponse { Token = token });
     }
 }

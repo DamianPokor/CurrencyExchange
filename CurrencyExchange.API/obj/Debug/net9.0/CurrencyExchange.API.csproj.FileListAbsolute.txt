@@ -166,3 +166,7 @@ D:\Szkoła\Projekt indywidualny\CurrencyExchange\CurrencyExchange.API\obj\Debug\
 D:\Szkoła\Projekt indywidualny\CurrencyExchange\CurrencyExchange.API\bin\Debug\net9.0\Swashbuckle.AspNetCore.Swagger.dll
 D:\Szkoła\Projekt indywidualny\CurrencyExchange\CurrencyExchange.API\bin\Debug\net9.0\Swashbuckle.AspNetCore.SwaggerGen.dll
 D:\Szkoła\Projekt indywidualny\CurrencyExchange\CurrencyExchange.API\bin\Debug\net9.0\Swashbuckle.AspNetCore.SwaggerUI.dll
+D:\Szkoła\Projekt indywidualny\CurrencyExchange\CurrencyExchange.API\obj\Debug\net9.0\rpswa.dswa.cache.json
+D:\Szkoła\Projekt indywidualny\CurrencyExchange\CurrencyExchange.API\obj\Debug\net9.0\rjimswa.dswa.cache.json
+D:\Szkoła\Projekt indywidualny\CurrencyExchange\CurrencyExchange.API\obj\Debug\net9.0\rjsmrazor.dswa.cache.json
+D:\Szkoła\Projekt indywidualny\CurrencyExchange\CurrencyExchange.API\obj\Debug\net9.0\rjsmcshtml.dswa.cache.json

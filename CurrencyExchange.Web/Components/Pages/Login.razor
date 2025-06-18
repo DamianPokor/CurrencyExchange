@@ -1,14 +1,20 @@
 @page "/login"
-@using Microsoft.AspNetCore.Components.Forms
-@using System.ComponentModel.DataAnnotations
+
 @inject NavigationManager Navigation
+
+@using System.ComponentModel.DataAnnotations
 
 <PageTitle>Login</PageTitle>
 
+
+<link href="/css/login.css" rel="stylesheet" />
+
 <div class="login-container">
     <div class="header">
-        <div class="logo">
-            <div class="logo-icon">$</div>
+        <div class= "logo-section">
+            <div class="logo">
+                <div class="logo-icon">$</div>
+            </div>
         </div>
         <div class="header-buttons">
             <button class="btn btn-secondary" @onclick="NavigateToHome">Back to Home</button>
@@ -17,15 +23,15 @@
     </div>
 
     <div class="login-card">
-        <div class="logo-section">
-            <div class="logo-icon large">$</div>
-            <h2>Login</h2>
-            <p>Sign in to your account</p>
-        </div>
-
         <EditForm Model="loginModel" OnValidSubmit="HandleLogin" class="login-form">
             <DataAnnotationsValidator />
             
+            <div class="logo-section">
+                <div class="logo-icon large">$</div>
+                <h2>Login</h2>
+                <p>Sign in to your account</p>
+            </div>
+
             <div class="form-group">
                 <div class="input-container">
                     <span class="input-icon">👤</span>
@@ -78,265 +84,8 @@
             </button>
         </EditForm>
     </div>
+
 </div>
-
-<style>
-    .login-container {
-        min-height: 100vh;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        display: flex;
-        flex-direction: column;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-
-    .header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 20px 40px;
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(10px);
-    }
-
-    .logo {
-        display: flex;
-        align-items: center;
-    }
-
-    .logo-icon {
-        width: 50px;
-        height: 50px;
-        background: #333;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-weight: bold;
-        font-size: 24px;
-        border: 3px solid #333;
-    }
-
-    .logo-icon.large {
-        width: 80px;
-        height: 80px;
-        font-size: 36px;
-        margin-bottom: 20px;
-    }
-
-    .header-buttons {
-        display: flex;
-        gap: 10px;
-    }
-
-    .btn {
-        padding: 12px 24px;
-        border: none;
-        border-radius: 6px;
-        font-size: 14px;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-    }
-
-    .btn-secondary {
-        background: rgba(255, 255, 255, 0.2);
-        color: white;
-        border: 1px solid rgba(255, 255, 255, 0.3);
-    }
-
-    .btn-secondary:hover {
-        background: rgba(255, 255, 255, 0.3);
-        transform: translateY(-2px);
-    }
-
-    .btn-primary {
-        background: #333;
-        color: white;
-        width: 100%;
-        padding: 16px;
-        font-size: 16px;
-        margin: 20px 0;
-    }
-
-    .btn-primary:hover:not(:disabled) {
-        background: #555;
-        transform: translateY(-2px);
-    }
-
-    .btn-primary:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-    }
-
-    .btn-outline {
-        background: transparent;
-        color: #333;
-        border: 2px solid #ddd;
-        width: 100%;
-        padding: 14px;
-        margin-bottom: 10px;
-    }
-
-    .btn-outline:hover {
-        background: #f8f9fa;
-        border-color: #333;
-    }
-
-    .btn-google {
-        background: white;
-        color: #757575;
-        border: 1px solid #dadce0;
-        width: 100%;
-        padding: 14px;
-        font-weight: normal;
-    }
-
-    .btn-google:hover {
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        background: #f8f9fa;
-    }
-
-    .btn-google img {
-        width: 18px;
-        height: 18px;
-    }
-
-    .login-card {
-        flex: 1;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 40px 20px;
-    }
-
-    .login-form {
-        background: white;
-        padding: 40px;
-        border-radius: 12px;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-        width: 100%;
-        max-width: 400px;
-        backdrop-filter: blur(10px);
-    }
-
-    .logo-section {
-        text-align: center;
-        margin-bottom: 30px;
-    }
-
-    .logo-section h2 {
-        margin: 10px 0 5px 0;
-        color: #333;
-        font-size: 28px;
-        font-weight: 600;
-    }
-
-    .logo-section p {
-        color: #666;
-        font-size: 14px;
-        margin: 0;
-    }
-
-    .form-group {
-        margin-bottom: 20px;
-    }
-
-    .input-container {
-        position: relative;
-        display: flex;
-        align-items: center;
-    }
-
-    .input-icon {
-        position: absolute;
-        left: 12px;
-        z-index: 1;
-        color: #666;
-        font-size: 16px;
-    }
-
-    .form-input {
-        width: 100%;
-        padding: 14px 14px 14px 45px;
-        border: 2px solid #e1e5e9;
-        border-radius: 6px;
-        font-size: 16px;
-        transition: border-color 0.3s ease;
-        background: #f8f9fa;
-    }
-
-    .form-input:focus {
-        outline: none;
-        border-color: #667eea;
-        background: white;
-    }
-
-    .validation-message {
-        color: #dc3545;
-        font-size: 12px;
-        margin-top: 5px;
-        display: block;
-    }
-
-    .error-message {
-        background: #f8d7da;
-        color: #721c24;
-        padding: 10px;
-        border-radius: 6px;
-        font-size: 14px;
-        margin: 10px 0;
-        text-align: center;
-    }
-
-    .forgot-password {
-        text-align: center;
-        margin: 20px 0;
-    }
-
-    .forgot-password a {
-        color: #667eea;
-        text-decoration: none;
-        font-size: 14px;
-    }
-
-    .forgot-password a:hover {
-        text-decoration: underline;
-    }
-
-    .divider {
-        text-align: center;
-        margin: 30px 0;
-        position: relative;
-        color: #666;
-        font-size: 14px;
-    }
-
-    .divider::before {
-        content: '';
-        position: absolute;
-        top: 50%;
-        left: 0;
-        right: 0;
-        height: 1px;
-        background: #e1e5e9;
-        z-index: 0;
-    }
-
-    .divider span {
-        background: white;
-        padding: 0 15px;
-        position: relative;
-        z-index: 1;
-    }
-
-   
-</style>
 
 @code {
     private LoginModel loginModel = new();
@@ -349,15 +98,10 @@
         {
             isLoading = true;
             errorMessage = string.Empty;
-            
-            // Simulate login process
             await Task.Delay(1500);
-            
-            // Add your authentication logic here
-            // For demo purposes, we'll just check for a simple condition
+
             if (loginModel.Username == "admin" && loginModel.Password == "password")
             {
-                // Successful login - redirect to dashboard or main page
                 Navigation.NavigateTo("/dashboard");
             }
             else
@@ -365,7 +109,7 @@
                 errorMessage = "Invalid username or password.";
             }
         }
-        catch (Exception ex)
+        catch
         {
             errorMessage = "An error occurred during login. Please try again.";
         }
@@ -375,26 +119,15 @@
         }
     }
 
-    private void HandleForgotPassword()
-    {
-        // Implement forgot password logic
-        Navigation.NavigateTo("/forgot-password");
-    }
+    private void HandleForgotPassword() => Navigation.NavigateTo("/forgot-password");
 
-    private void HandleGoogleLogin()
-    {
-        // Implement Google OAuth login
-        // This would typically redirect to Google's OAuth endpoint
-        Console.WriteLine("Google login clicked");
-    }
+    private void HandleGoogleLogin() => Console.WriteLine("Google login clicked");
 
-    private void NavigateToHome()
-    {
-        Navigation.NavigateTo("/");
-    }
+    private void NavigateToHome() => Navigation.NavigateTo("/");
 
     private void NavigateToRegister()
     {
+        Console.WriteLine("Register clicked");
         Navigation.NavigateTo("/register");
     }
 
@@ -408,3 +141,5 @@
         public string Password { get; set; } = string.Empty;
     }
 }
+
+

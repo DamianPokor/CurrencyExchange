@@ -23,14 +23,3 @@ namespace CurrencyExchange.API.Data.Entities
     }
 }
 
-
-/*public class Account
-{
-    public required int accountId{get, set}
-        public required int userId{get, set}
-    public required string accountNumber {get,set}
-    public required int balance {get,set}
-    public required string currency{get,set}
-    public required string createdAt{get,se}
-}*/
-
